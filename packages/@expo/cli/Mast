@@ -1,0 +1,67 @@
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from "react";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+
+export default function MastManager() {
+  const [mastNumber, setMastNumber] = useState("");
+  const [mastData, setMastData] = useState(null);
+  const [teamName, setTeamName] = useState("");
+  const [machineOperator, setMachineOperator] = useState("");
+  const [machineType, setMachineType] = useState("");
+  const [tasks, setTasks] = useState({
+    erected: false,
+    so: false,
+    ks: false,
+    tensioned: false,
+    optimization: false,
+    kOppeng: false,
+  });
+
+  const handleInputChange = (e) => {
+    setMastNumber(e.target.value);
+  };
+
+  const searchMast = () => {
+    setMastData({
+      mastNumber: mastNumber,
+      mastType: "Type 1200",
+      location: "Station A",
+      length: "15m",
+    });
+  };
+
+  const generateReport = () => {
+    const selectedTasks = Object.keys(tasks).filter((t) => tasks[t]);
+    const today = new Date().toLocaleDateString();
+    const report = `
+      Daily Report
+      Date: ${today}
+      Mast Number: ${mastNumber}
+      Team: ${teamName}
+      Machine Operator: ${machineOperator}
+      Machine Type: ${machineType}
+      Completed Tasks: ${selectedTasks.join(", ")}
+    `;
+
+    const doc = new jsPDF();
+    doc.text(report, 10, 10);
+    doc.save(`Daily_Report_${mastNumber}_${today}.pdf`);
+  };
+
+  return (
+    <div className="p-4 space-y-4">
+      <h1 className="text-2xl font-bold">Mast Manager</h1>
+      <Input
+        placeholder="Search for MastRef.No"
+        value={mastNumber}
+        onChange={handleInputChange}
+      />
+      <Button onClick={searchMast}>Search Mast</Button>
+      <Button onClick={generateReport}>Generate PDF</Button>
+    </div>
+  );
+}
